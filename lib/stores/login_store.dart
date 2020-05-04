@@ -7,16 +7,38 @@ class LoginStore = _LoginStore with _$LoginStore;
 abstract class _LoginStore with Store {
   
   @observable
+  bool showPassword = false;
+
+  @observable
   String email = "";
+
+  @observable
+  String password = "";
+  
+  @observable
+  bool loading = false;
+
+  @observable
+  bool loggedIn = false;
+ 
+  @action
+  void toggleShowPassword() => showPassword = !showPassword;
 
   @action
   void setEmail(String value) => email = value;
 
-  @observable
-  String password = "";
-
   @action
   void setPassword(String value) => password = value;
+
+  @action
+  Future<void> login() async {
+    loading = true;
+    
+    await Future.delayed(Duration(seconds: 2));
+
+    loading = false;
+    loggedIn = true;
+  }
 
   @computed
   bool get isEmailValid => RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
@@ -26,4 +48,7 @@ abstract class _LoginStore with Store {
 
   @computed
   bool get isFormValid => isEmailValid && isPasswordValid;
+
+  @computed
+  Function get loginPressed => (isFormValid && !loading) ? login : null;
 }
