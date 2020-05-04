@@ -14,6 +14,9 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
+
+  TextEditingController textEditingController = TextEditingController();
+
   ListStore listStore = ListStore();
 
   @override
@@ -62,13 +65,19 @@ class _ListScreenState extends State<ListScreen> {
                         Observer(
                           builder: (_) {
                             return CustomTextField(
+                              controller: textEditingController,
                               hint: 'Tarefa',
                               onChanged: listStore.setNewTodo,
                               suffix: listStore.isTodoValid
                                   ? CustomIconButton(
                                       radius: 32,
                                       iconData: Icons.add,
-                                      onTap: listStore.addNewTodo,
+                                      onTap: () {
+                                        listStore.addNewTodo();
+                                        WidgetsBinding.instance.addPostFrameCallback(
+                                          (_) => textEditingController.clear()
+                                        );
+                                      },
                                     )
                                   : null,
                             );
@@ -83,11 +92,21 @@ class _ListScreenState extends State<ListScreen> {
                               return ListView.separated(
                                 itemCount: listStore.todoList.length,
                                 itemBuilder: (_, index) {
-                                  return ListTile(
-                                    title: Text(
-                                      listStore.todoList[index],
-                                    ),
-                                    onTap: () {},
+                                  final todo = listStore.todoList[index];
+
+                                  return Observer(
+                                    builder: (_) {
+                                      return ListTile(
+                                        title: Text(
+                                          todo.title,
+                                          style: todo.done ? TextStyle(
+                                            decoration: TextDecoration.lineThrough,
+                                            color: todo.done ? Colors.grey : Colors.black,
+                                          ) : null,
+                                        ),
+                                        onTap: todo.toggleDone,
+                                      );
+                                    },
                                   );
                                 },
                                 separatorBuilder: (_, __) {
