@@ -26,6 +26,29 @@ mixin _$LoginStore on _LoginStore, Store {
   @override
   bool get isFormValid =>
       (_$isFormValidComputed ??= Computed<bool>(() => super.isFormValid)).value;
+  Computed<Function> _$loginPressedComputed;
+
+  @override
+  Function get loginPressed =>
+      (_$loginPressedComputed ??= Computed<Function>(() => super.loginPressed))
+          .value;
+
+  final _$showPasswordAtom = Atom(name: '_LoginStore.showPassword');
+
+  @override
+  bool get showPassword {
+    _$showPasswordAtom.context.enforceReadPolicy(_$showPasswordAtom);
+    _$showPasswordAtom.reportObserved();
+    return super.showPassword;
+  }
+
+  @override
+  set showPassword(bool value) {
+    _$showPasswordAtom.context.conditionallyRunInAction(() {
+      super.showPassword = value;
+      _$showPasswordAtom.reportChanged();
+    }, _$showPasswordAtom, name: '${_$showPasswordAtom.name}_set');
+  }
 
   final _$emailAtom = Atom(name: '_LoginStore.email');
 
@@ -61,7 +84,58 @@ mixin _$LoginStore on _LoginStore, Store {
     }, _$passwordAtom, name: '${_$passwordAtom.name}_set');
   }
 
+  final _$loadingAtom = Atom(name: '_LoginStore.loading');
+
+  @override
+  bool get loading {
+    _$loadingAtom.context.enforceReadPolicy(_$loadingAtom);
+    _$loadingAtom.reportObserved();
+    return super.loading;
+  }
+
+  @override
+  set loading(bool value) {
+    _$loadingAtom.context.conditionallyRunInAction(() {
+      super.loading = value;
+      _$loadingAtom.reportChanged();
+    }, _$loadingAtom, name: '${_$loadingAtom.name}_set');
+  }
+
+  final _$loggedInAtom = Atom(name: '_LoginStore.loggedIn');
+
+  @override
+  bool get loggedIn {
+    _$loggedInAtom.context.enforceReadPolicy(_$loggedInAtom);
+    _$loggedInAtom.reportObserved();
+    return super.loggedIn;
+  }
+
+  @override
+  set loggedIn(bool value) {
+    _$loggedInAtom.context.conditionallyRunInAction(() {
+      super.loggedIn = value;
+      _$loggedInAtom.reportChanged();
+    }, _$loggedInAtom, name: '${_$loggedInAtom.name}_set');
+  }
+
+  final _$loginAsyncAction = AsyncAction('login');
+
+  @override
+  Future<void> login() {
+    return _$loginAsyncAction.run(() => super.login());
+  }
+
   final _$_LoginStoreActionController = ActionController(name: '_LoginStore');
+
+  @override
+  void toggleShowPassword() {
+    final _$actionInfo = _$_LoginStoreActionController.startAction();
+    try {
+      return super.toggleShowPassword();
+    } finally {
+      _$_LoginStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setEmail(String value) {
@@ -86,7 +160,7 @@ mixin _$LoginStore on _LoginStore, Store {
   @override
   String toString() {
     final string =
-        'email: ${email.toString()},password: ${password.toString()},isEmailValid: ${isEmailValid.toString()},isPasswordValid: ${isPasswordValid.toString()},isFormValid: ${isFormValid.toString()}';
+        'showPassword: ${showPassword.toString()},email: ${email.toString()},password: ${password.toString()},loading: ${loading.toString()},loggedIn: ${loggedIn.toString()},isEmailValid: ${isEmailValid.toString()},isPasswordValid: ${isPasswordValid.toString()},isFormValid: ${isFormValid.toString()},loginPressed: ${loginPressed.toString()}';
     return '{$string}';
   }
 }
