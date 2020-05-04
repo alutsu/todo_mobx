@@ -2,7 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:todomobx/stores/list_store.dart';
+import 'package:todomobx/stores/login_store.dart';
 import 'package:todomobx/widgets/custom_icon_button.dart';
 import 'package:todomobx/widgets/custom_text_field.dart';
 
@@ -18,6 +21,22 @@ class _ListScreenState extends State<ListScreen> {
   TextEditingController textEditingController = TextEditingController();
 
   ListStore listStore = ListStore();
+
+  ReactionDisposer disposer;
+
+  @override
+  void didChangeDependencies() {
+    
+    disposer = reaction(
+      (_) => Provider.of<LoginStore>(context, listen: false).loggedIn,
+      (loggedInd) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => LoginScreen()));
+      }
+    );
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +64,7 @@ class _ListScreenState extends State<ListScreen> {
                       icon: Icon(Icons.exit_to_app),
                       color: Colors.white,
                       onPressed: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => LoginScreen()));
+                        Provider.of<LoginStore>(context, listen: false).logout();
                       },
                     ),
                   ],
@@ -126,5 +144,12 @@ class _ListScreenState extends State<ListScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    disposer();
+
+    super.dispose();
   }
 }
